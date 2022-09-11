@@ -10,7 +10,7 @@ public class TelevisionService {
     private final TelevisionRepository televisionRepository;
 
     @Autowired
-    public TelevisionController(TelevisionRepository televisionRepository){
+    public TelevisionService(TelevisionRepository televisionRepository) {
         this.televisionRepository = televisionRepository;
     }
 }
