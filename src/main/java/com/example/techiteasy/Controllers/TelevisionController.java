@@ -16,10 +16,6 @@ import java.util.Optional;
 @RestController
 public class TelevisionController {
 
-//@autowired
-//TelevisionRepository televisionRepository;
-
-
     private final TelevisionRepository televisionRepository;
 
     @Autowired
@@ -57,7 +53,6 @@ public class TelevisionController {
         televisionRepository.save(t);
         return ResponseEntity.created(null).body(t);
     }
-//
 //    @PostMapping("televisions")
 //    public ResponseEntity<Object> addTelevision(@RequestBody List<String> television) {
 //
