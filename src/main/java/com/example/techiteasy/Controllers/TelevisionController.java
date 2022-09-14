@@ -1,13 +1,17 @@
 package com.example.techiteasy.Controllers;
 
+import com.example.techiteasy.Dtos.TelevisionDto;
+import com.example.techiteasy.Dtos.TelevisionInputDto;
 import com.example.techiteasy.Exceptions.RecordNotFoundException;
 import com.example.techiteasy.Models.Television;
 import com.example.techiteasy.Repositories.TelevisionRepository;
+import com.example.techiteasy.Services.TelevisionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,42 +20,45 @@ import java.util.Optional;
 @RestController
 public class TelevisionController {
 
-    private final TelevisionRepository televisionRepository;
+    private final TelevisionRepository repos;
+    private final TelevisionService service;
 
-    @Autowired
-    public TelevisionController(TelevisionRepository televisionRepository){
-        this.televisionRepository = televisionRepository;
+
+
+    public TelevisionController(TelevisionRepository repos, TelevisionService service){
+        this.repos = repos;
+        this.service=service;
     }
 
-    @GetMapping("/televisions")
-    public ResponseEntity<List<Television>> getAllTelevisions(@RequestParam(value = "brand", required = false)String brand) {
-        List<Television> televisions;
 
-        if(brand == null){
-            televisions= televisionRepository.findAll();
-            return ResponseEntity.ok().body(televisions);
+//    @Autowired
+//    public TelevisionController(TelevisionService televisionService){
+//        this.televisionService = televisionService;
+//    }
+    @GetMapping("/televisions")
+    public ResponseEntity<List<TelevisionDto>> getAllTelevisions(@RequestParam(value = "brand", required = false)Optional<String> brand) {
+        List<TelevisionDto> dtos;
+
+        if(brand.isEmpty()){
+            dtos = service.getAllTelevision();
+
         } else {
-            televisions = televisionRepository.findAllTelevisionsByBrandEqualsIgnoreCase(brand);
+            dtos = service.getAllTelevisionsByBrand(brand.get());
         }
-        return ResponseEntity.ok().body(televisions);
+        return ResponseEntity.ok().body(dtos);
     }
 
     @GetMapping("/televisions/{id}")
     public ResponseEntity<Object> getTelevision(@PathVariable("id") Long id) {
-        Optional<Television> television = televisionRepository.findById(id);
+        TelevisionDto television = service.getTelevisionById(id);
 
-        if (television.isEmpty()) { // determine if id exists
-            throw new RecordNotFoundException("No television found with id: " + id);
-        } else {
-            Television television1 = television.get();
-            return ResponseEntity.ok().body(television1);
-        }
+        return ResponseEntity.ok().body(television);
     }
 
     @PostMapping("/televisions")
-    public  ResponseEntity<Object>createTelevision(@RequestBody Television t) {
-        televisionRepository.save(t);
-        return ResponseEntity.created(null).body(t);
+    public  ResponseEntity<Object>createTelevision(@RequestBody TelevisionInputDto inputDto) {
+        TelevisionDto dto = service.createTelevision(inputDto);
+        return ResponseEntity.created(null).body(dto);
     }
 //    @PostMapping("televisions")
 //    public ResponseEntity<Object> addTelevision(@RequestBody List<String> television) {
@@ -62,8 +69,8 @@ public class TelevisionController {
 
 
 @DeleteMapping("/televisions/{id}")
-    public ResponseEntity<Object> deleteTelevision(@PathVariable("id") Long id){
-        televisionRepository.deleteById(id);
+    public ResponseEntity<Object> deleteTelevision(@PathVariable Long id){
+        service.deleteTelevision(id);
         return  ResponseEntity.noContent().build();
 }
 //    @PutMapping("televisions/{id}")
@@ -76,38 +83,14 @@ public class TelevisionController {
 //    }
 
     @PutMapping("/televisions/{id}")
-    public ResponseEntity<Object> updateTelevision(@PathVariable Long id, @RequestBody Television newTelevision) {
+    public ResponseEntity<Object> updateTelevision(@PathVariable Long id, @RequestBody TelevisionInputDto newTelevision) {
 
-        Optional<Television> television = televisionRepository.findById(id);
+        TelevisionDto dto = service.updateTelevision(id, newTelevision);
 
-        if (television.isEmpty()) {
 
-            throw new RecordNotFoundException("No television found with id: " + id);
-
-        } else {
-            Television television1 = television.get();
-            television1.setId(television1.getId());
-            television1.setAmbilight(newTelevision.getAmbiLight());
-            television1.setAvailableSize(newTelevision.getAvailableSize());
-            television1.setAmbilight(newTelevision.getAmbiLight());
-            television1.setBluetooth(newTelevision.getBluetooth());
-            television1.setBrand(newTelevision.getBrand());
-            television1.setHdr(newTelevision.getHdr());
-            television1.setName(newTelevision.getName());
-            television1.setOriginalStock(newTelevision.getOriginalStock());
-            television1.setPrice(newTelevision.getPrice());
-            television1.setRefreshRate(newTelevision.getRefreshRate());
-            television1.setScreenQuality(newTelevision.getScreenQuality());
-            television1.setScreenType(newTelevision.getScreenType());
-            television1.setSmartTv(newTelevision.getSmartTv());
-            television1.setSold(newTelevision.getSold());
-            television1.setType(newTelevision.getType());
-            television1.setVoiceControl(newTelevision.getVoiceControl());
-            television1.setWifi(newTelevision.getWifi());
-            televisionRepository.save(television1);
-            return ResponseEntity.ok().body(television1);
-        }
+        return ResponseEntity.ok().body(dto);
     }
+}
 //    @DeleteMapping("televisions/{id}")
 //    public ResponseEntity<Object> deleteTelevision(@PathVariable Integer id) {
 //        if (id > televisions.size() - 1) { // determine if id exists
@@ -118,7 +101,7 @@ public class TelevisionController {
 //        }
 //    }
 
-}
+
 
 
 
