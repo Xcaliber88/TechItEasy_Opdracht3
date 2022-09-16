@@ -3,6 +3,7 @@ package com.example.techiteasy.Services;
 import com.example.techiteasy.Dtos.TelevisionDto;
 import com.example.techiteasy.Dtos.TelevisionInputDto;
 import com.example.techiteasy.Exceptions.RecordNotFoundException;
+import com.example.techiteasy.Models.RemoteController;
 import com.example.techiteasy.Models.Television;
 import com.example.techiteasy.Repositories.TelevisionRepository;
 import org.springframework.stereotype.Service;
@@ -59,26 +60,29 @@ public class TelevisionService {
         return fromTelevision(savedTelevision);
     }
 
-    public void deleteTelevision(@RequestBody Long id){
-    Optional<Television> televisionFound = repos.findById(id);
-    if (televisionFound == null)
-        throw new RecordNotFoundException("cannot find television");
-    repos.deleteById(id);
-}
+    public void deleteTelevision(@RequestBody  Long id) {
+        Optional<Television> televisionFound = repos.findById(id);
+        if(televisionFound==null){
+            throw new RuntimeException("cannot find television");
+        } else{
+            repos.deleteById(id);
+        }
+    }
+
     public TelevisionDto updateTelevision(Long id, TelevisionInputDto inputDto) {
 
 
         if (repos.findById(id).isEmpty())
             throw new RecordNotFoundException("Cannot find television");
 
-        Television savedTelevision = this.repos.findById(id).get();
+        Television foundTelevision = this.repos.findById(id).get();
 
         Television tv1= toTelevision(inputDto);
-        tv1.setId(savedTelevision.getId());
+        tv1.setId(id); //geef de bestaande id aan nieuwe tv
 
-        repos.save(tv1);
+        repos.save(tv1); // saved alle aangepaste waarden
 
-        return fromTelevision(tv1);
+        return fromTelevision(tv1); // vertaling van television naar dto
     }
 
     public static TelevisionDto fromTelevision(Television television) {
@@ -130,7 +134,4 @@ public class TelevisionService {
         return television;
 
     }
-
-
-
 }

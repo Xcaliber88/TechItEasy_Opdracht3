@@ -6,7 +6,9 @@ public class TelevisionDto {
 
     public Long id;
     public String type;
+
     public String brand;
+
     public String name;
     public Double price;
     public Double availableSize;
