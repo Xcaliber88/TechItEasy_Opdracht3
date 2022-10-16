@@ -1,9 +1,6 @@
 package com.example.techiteasy.Models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="RemoteControllers")
@@ -20,6 +17,9 @@ public class RemoteController {
     private Double price;
     private Integer originalStock;
 
+    @OneToOne(mappedBy = "remoteController")
+    Television television;
+
     public RemoteController (String compatibleWith, String batteryType,String name, String brand, Double price, Integer originalStock){
         this.compatibleWith = compatibleWith;
         this.batteryType = batteryType;
@@ -31,6 +31,14 @@ public class RemoteController {
 
     public RemoteController(){
     };
+
+    public Television getTelevision() {
+        return television;
+    }
+
+    public void setTelevision(Television television) {
+        this.television = television;
+    }
 
     public Long getId() {
         return id;

@@ -3,8 +3,11 @@ package com.example.techiteasy.Services;
 import com.example.techiteasy.Dtos.TelevisionDto;
 import com.example.techiteasy.Dtos.TelevisionInputDto;
 import com.example.techiteasy.Exceptions.RecordNotFoundException;
+import com.example.techiteasy.Models.Ci_Module;
 import com.example.techiteasy.Models.RemoteController;
 import com.example.techiteasy.Models.Television;
+import com.example.techiteasy.Repositories.Ci_ModuleRepository;
+import com.example.techiteasy.Repositories.RemoteControllerRepository;
 import com.example.techiteasy.Repositories.TelevisionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +20,19 @@ import java.util.Optional;
 public class TelevisionService {
 
     private final TelevisionRepository repos;
-    public TelevisionService(TelevisionRepository repos) {this.repos = repos;}
+    private final RemoteControllerRepository remoteRepos;
+    private final RemoteControllerService remoteService;
+    private final Ci_ModuleService ciModuleService;
+
+    private final Ci_ModuleRepository ciModuleRepos;
+
+    public TelevisionService(TelevisionRepository repos, RemoteControllerRepository remoteRepos, RemoteControllerService remoteService, Ci_ModuleService ciModuleService, Ci_ModuleRepository ciModuleRepos) {
+        this.repos = repos;
+        this.remoteRepos = remoteRepos;
+        this.remoteService = remoteService;
+        this.ciModuleService = ciModuleService;
+        this.ciModuleRepos = ciModuleRepos;
+    }
 
 
     public List<TelevisionDto> getAllTelevision() {
@@ -85,10 +100,22 @@ public class TelevisionService {
         return fromTelevision(tv1); // vertaling van television naar dto
     }
 
-    public static TelevisionDto fromTelevision(Television television) {
+    public TelevisionDto fromTelevision(Television television) {
 
         TelevisionDto dto= new TelevisionDto();
 
+        if(television.getRemoteController()!= null){
+//            RemoteController remoteController= television.getRemoteController();
+//            RemoteControllerDto remoteControllerDto = remoteService.fromRemoteController(remoteController);
+//            dto.remoteControllerDto = remoteControllerDto;
+            dto.remoteControllerDto = remoteService.fromRemoteController(television.getRemoteController());
+        }
+
+        if(television.getCi_module()!= null){
+            dto.ciModuleDto = ciModuleService.fromCi_Modules(television.getCi_module());
+        }
+
+        dto.id = television.getId();
         dto.name = television.getName();
         dto.type = television.getType();
         dto.brand = television.getBrand();
@@ -133,5 +160,37 @@ public class TelevisionService {
 
         return television;
 
+    }
+
+    public TelevisionDto assignRemoteControllerToTelevision(Long televisionId, Long remoteControllerId) {
+        Optional<RemoteController> optionalRemoteController = remoteRepos.findById(remoteControllerId);
+        Optional<Television> optionalTelevision = repos.findById(televisionId);
+        
+        if (optionalTelevision.isPresent() && optionalRemoteController.isPresent()) {
+            Television television = optionalTelevision.get();
+            RemoteController remoteController = optionalRemoteController.get();
+            television.setRemoteController(remoteController);
+            repos.save(television);
+            return fromTelevision(television);
+
+        } else {
+            throw new RuntimeException("tv or remote does not exist");
+        }
+
+    }
+
+    public TelevisionDto assignCiModuleToTelevision(Long televisionId, Long ciModuleId){
+        Optional<Television> optionalTelevision = repos.findById(televisionId);
+        Optional<Ci_Module> optionalCiModule= ciModuleRepos.findById(ciModuleId);
+
+        if(optionalTelevision.isPresent() && optionalCiModule.isPresent()){
+            Television television= optionalTelevision.get();
+            Ci_Module ciModule= optionalCiModule.get();
+            television.setCi_module(ciModule);
+            repos.save(television);
+            return fromTelevision(television);
+        }else {
+            throw new RuntimeException("tv or ci-Module does not exist");
+        }
     }
 }

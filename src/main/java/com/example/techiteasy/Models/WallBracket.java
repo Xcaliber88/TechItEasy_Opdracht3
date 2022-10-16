@@ -1,11 +1,10 @@
 package com.example.techiteasy.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.core.SpringVersion;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="wallBrackets")
@@ -18,6 +17,10 @@ public class WallBracket {
     private Boolean adjustable;
     private String name;
     private Double price;
+
+    @OneToMany(mappedBy = "television")
+    @JsonIgnore
+    List<TelevisionWallBracket> televisionWallBrackets;
 
     public WallBracket(String size, Boolean adjustable, String name, Double price) {
         this.size = size;

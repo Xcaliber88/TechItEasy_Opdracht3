@@ -2,19 +2,16 @@ package com.example.techiteasy.Controllers;
 
 import com.example.techiteasy.Dtos.TelevisionDto;
 import com.example.techiteasy.Dtos.TelevisionInputDto;
-import com.example.techiteasy.Exceptions.RecordNotFoundException;
-import com.example.techiteasy.Models.Television;
+import com.example.techiteasy.Dtos.WallBracketDto;
 import com.example.techiteasy.Repositories.TelevisionRepository;
 import com.example.techiteasy.Services.TelevisionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.example.techiteasy.Services.TelevisionWallBracketService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.persistence.Id;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,11 +22,14 @@ public class TelevisionController {
     private final TelevisionRepository repos;
     private final TelevisionService service;
 
+    private final TelevisionWallBracketService televisionWallBracketService;
 
 
-    public TelevisionController(TelevisionRepository repos, TelevisionService service){
+
+    public TelevisionController(TelevisionRepository repos, TelevisionService service, TelevisionWallBracketService televisionWallBracketService){
         this.repos = repos;
         this.service=service;
+        this.televisionWallBracketService = televisionWallBracketService;
     }
 
 
@@ -96,6 +96,26 @@ public class TelevisionController {
 
         return ResponseEntity.ok().body(dto);
     }
+
+    @PutMapping("/televisions/{televisionId}/remotecontrollers/{remoteControllerId}")
+    public ResponseEntity<Object> assignRemoteControllerToTelevision(@PathVariable Long televisionId, @PathVariable Long remoteControllerId ){
+
+        TelevisionDto televisionDto=  service.assignRemoteControllerToTelevision(televisionId,remoteControllerId);
+        return ResponseEntity.ok().body(televisionDto);
+    }
+
+    @PutMapping("televisions/{televisionId}/cimodules/{ciModuleId}")
+    ResponseEntity<Object> assignCiModuleToTelevision(@PathVariable Long televisionId, @PathVariable Long ciModuleId){
+
+        TelevisionDto televisionDto= service.assignCiModuleToTelevision(televisionId,ciModuleId);
+        return ResponseEntity.ok().body(televisionDto);
+    }
+
+    @GetMapping("/televisions/wallBrackets/{televisionId}")
+    public Collection<WallBracketDto> getWallBracketByTelevisionId(@PathVariable("televisionId") Long televisionId){
+        return televisionWallBracketService.getTelevisionWallBracketByTelevisionId(televisionId);
+    }
+
 }
 //    @DeleteMapping("televisions/{id}")
 //    public ResponseEntity<Object> deleteTelevision(@PathVariable Integer id) {

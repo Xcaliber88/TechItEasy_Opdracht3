@@ -71,10 +71,11 @@ public class RemoteControllerService {
     }
 
 
-    public static RemoteControllerDto fromRemoteController(RemoteController remoteController){
+    public RemoteControllerDto fromRemoteController(RemoteController remoteController){
 
         RemoteControllerDto dto = new RemoteControllerDto();
 
+        dto.id = remoteController.getId();
         dto.brand = remoteController.getBrand();
         dto.name = remoteController.getName();
         dto.batteryType = remoteController.getBatteryType();

@@ -1,9 +1,9 @@
 package com.example.techiteasy.Models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="Ci_Modules")
@@ -16,6 +16,17 @@ public class Ci_Module {
     private String type;
     private Double price;
 
+    @OneToMany(mappedBy = "ci_module")
+    @JsonIgnore
+    List<Television> television;
+
+    public List<Television> getTelevision() {
+        return television;
+    }
+
+    public void setTelevision(List<Television> television) {
+        this.television = television;
+    }
 
     public Ci_Module(String name, String type, Double price) {
         this.name = name;

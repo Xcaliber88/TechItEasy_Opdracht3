@@ -2,12 +2,12 @@ package com.example.techiteasy.Controllers;
 
 import com.example.techiteasy.Dtos.RemoteControllerDto;
 import com.example.techiteasy.Dtos.RemoteControllerInputDto;
-import com.example.techiteasy.Models.RemoteController;
 import com.example.techiteasy.Services.RemoteControllerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.rmi.Remote;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,16 +20,16 @@ public class RemoteControllerController {
         this.service = service;
     }
 
-    @GetMapping("/remoteControllers")
-    public ResponseEntity<List<RemoteControllerDto>> getAllRemoteControllers(){
-        List<RemoteControllerDto> dtos;
+//    @GetMapping("/remoteControllers")
+//    public ResponseEntity<List<RemoteControllerDto>> getAllRemoteControllers(){
+//        List<RemoteControllerDto> dtos;
+//
+//        dtos= service.getAllRemoteControllers();
+//
+//        return ResponseEntity.ok().body(dtos);
+//    }
 
-        dtos= service.getAllRemoteControllers();
-
-        return ResponseEntity.ok().body(dtos);
-    }
-
-    @GetMapping("/remoteControllers")
+    @GetMapping("/remoteControllers/brand")
     public ResponseEntity<List<RemoteControllerDto>> getAllRemoteControllers (@RequestParam(value= "brand", required = false) Optional<String> brand){
         List<RemoteControllerDto> dtos;
 
@@ -52,11 +52,14 @@ public class RemoteControllerController {
     public ResponseEntity<Object> createRemoteController(@RequestBody RemoteControllerInputDto inputDto ){
         RemoteControllerDto savedDto = service.createRemoteController(inputDto);
 
-        return ResponseEntity.created(null).body(savedDto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedDto.id).toUri();
+
+        return ResponseEntity.created(location).body(savedDto);
     }
 
     @DeleteMapping("/remoteControllers/{id}")
-    public ResponseEntity<Object> deleteRemoteController(@PathVariable("Id") Long id){
+    public ResponseEntity<Object> deleteRemoteController(@PathVariable("id") Long id){
         service.deleteRemoteController(id);
         return ResponseEntity.noContent().build();
     }

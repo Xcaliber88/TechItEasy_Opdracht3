@@ -1,6 +1,8 @@
 package com.example.techiteasy.Dtos;
 
+import com.example.techiteasy.Models.RemoteController;
 import com.example.techiteasy.Models.Television;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class TelevisionDto {
 
@@ -23,6 +25,12 @@ public class TelevisionDto {
     public Boolean ambilight;
     public Integer originalStock;
     public Integer sold;
+
+//    @JsonSerialize
+    public RemoteControllerDto remoteControllerDto;
+
+    public Ci_ModuleDto ciModuleDto;
+
 
 
 }

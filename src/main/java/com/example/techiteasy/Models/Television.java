@@ -1,9 +1,11 @@
 package com.example.techiteasy.Models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table (name="Televisions")
@@ -29,6 +31,44 @@ public class Television {
     private Boolean ambilight;
     private Integer originalStock;
     private Integer sold;
+
+    @OneToOne
+    RemoteController remoteController;
+
+    @ManyToOne (fetch = FetchType.EAGER)
+    @JoinColumn(name = "ci_module_id")
+    Ci_Module ci_module;
+
+    @OneToMany(mappedBy = "television")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    Collection<TelevisionWallBracket> televisionWallBrackets;
+
+
+
+    public RemoteController getRemoteController() {
+        return remoteController;
+    }
+
+    public void setRemoteController(RemoteController remoteController) {
+        this.remoteController = remoteController;
+    }
+
+    public Ci_Module getCi_module() {
+        return ci_module;
+    }
+
+    public void setCi_module(Ci_Module ci_module) {
+        this.ci_module = ci_module;
+    }
+
+    public Collection<TelevisionWallBracket> getTelevisionWallBrackets() {
+        return televisionWallBrackets;
+    }
+
+    public void setTelevisionWallBrackets(Collection<TelevisionWallBracket> televisionWallBrackets) {
+        this.televisionWallBrackets = televisionWallBrackets;
+    }
 
     public Television(String type, String brand, String name, Double price, Double availableSize, Double refreshRate, String screenType, String screenQuality, Boolean smartTv, Boolean wifi, Boolean voiceControl, Boolean hdr, Boolean bluetooth, Boolean ambilight, Integer originalStock, Integer sold) {
         this.type = type;
